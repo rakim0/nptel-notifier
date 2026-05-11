@@ -89,7 +89,6 @@ CREATE TABLE subscribers (
   id TEXT PRIMARY KEY,
   contact_type TEXT NOT NULL,
   contact_value TEXT NOT NULL,
-  subjects_json TEXT NOT NULL,
   created_at TEXT NOT NULL
 );
 
