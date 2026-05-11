@@ -26,6 +26,9 @@ CREATE TABLE IF NOT EXISTS subscriber_course_queries (
   FOREIGN KEY (subscriber_id) REFERENCES subscribers (id) ON DELETE CASCADE
 );
 
+CREATE INDEX IF NOT EXISTS idx_subscriber_course_queries_subscriber_id
+ON subscriber_course_queries (subscriber_id);
+
 CREATE TABLE IF NOT EXISTS notifications (
   id TEXT PRIMARY KEY,
   subscriber_id TEXT NOT NULL,

@@ -117,6 +117,9 @@ CREATE TABLE subscriber_course_queries (
     ON DELETE CASCADE
 );
 
+CREATE INDEX idx_subscriber_course_queries_subscriber_id
+ON subscriber_course_queries (subscriber_id);
+
 CREATE TABLE notifications (
   id TEXT PRIMARY KEY,
   subscriber_id TEXT NOT NULL,
