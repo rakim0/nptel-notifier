@@ -1,0 +1,6 @@
+name = "nptel-notifier-backend"
+main = "src/index.ts"
+compatibility_date = "2026-05-11"
+
+[observability]
+enabled = true
