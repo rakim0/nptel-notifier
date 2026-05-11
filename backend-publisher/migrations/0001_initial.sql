@@ -30,8 +30,9 @@ CREATE TABLE IF NOT EXISTS notifications (
   id TEXT PRIMARY KEY,
   subscriber_id TEXT NOT NULL,
   course_id TEXT NOT NULL,
+  notification_type TEXT NOT NULL,
   sent_at TEXT NOT NULL,
-  UNIQUE (subscriber_id, course_id),
+  UNIQUE (subscriber_id, course_id, notification_type),
   FOREIGN KEY (subscriber_id) REFERENCES subscribers (id) ON DELETE CASCADE,
   FOREIGN KEY (course_id) REFERENCES course_results (course_id)
 );

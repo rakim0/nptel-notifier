@@ -121,8 +121,9 @@ CREATE TABLE notifications (
   id TEXT PRIMARY KEY,
   subscriber_id TEXT NOT NULL,
   course_id TEXT NOT NULL,
+  notification_type TEXT NOT NULL,
   sent_at TEXT NOT NULL,
-  UNIQUE (subscriber_id, course_id)
+  UNIQUE (subscriber_id, course_id, notification_type)
 );
 ```
 
