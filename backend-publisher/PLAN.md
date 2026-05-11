@@ -15,6 +15,7 @@ Cloudflare Worker
 
 Cloudflare D1
   subscribers
+  subscriber_course_queries
   course_results
   notifications
 
@@ -40,6 +41,7 @@ Notification provider
 - Create a D1 database.
 - Add schema tables:
   - `subscribers`
+  - `subscriber_course_queries`
   - `course_results`
   - `notifications`
 - Bind the database to the Worker as `DB`.
@@ -102,6 +104,17 @@ CREATE TABLE course_results (
   row_hash TEXT NOT NULL,
   first_seen_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
+);
+
+CREATE TABLE subscriber_course_queries (
+  id TEXT PRIMARY KEY,
+  subscriber_id TEXT NOT NULL,
+  course_query TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  UNIQUE (subscriber_id, course_query),
+  FOREIGN KEY (subscriber_id)
+    REFERENCES subscribers (id)
+    ON DELETE CASCADE
 );
 
 CREATE TABLE notifications (

@@ -17,12 +17,21 @@ CREATE TABLE IF NOT EXISTS course_results (
   updated_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS subscriber_course_queries (
+  id TEXT PRIMARY KEY,
+  subscriber_id TEXT NOT NULL,
+  course_query TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  UNIQUE (subscriber_id, course_query),
+  FOREIGN KEY (subscriber_id) REFERENCES subscribers (id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS notifications (
   id TEXT PRIMARY KEY,
   subscriber_id TEXT NOT NULL,
   course_id TEXT NOT NULL,
   sent_at TEXT NOT NULL,
   UNIQUE (subscriber_id, course_id),
-  FOREIGN KEY (subscriber_id) REFERENCES subscribers (id),
+  FOREIGN KEY (subscriber_id) REFERENCES subscribers (id) ON DELETE CASCADE,
   FOREIGN KEY (course_id) REFERENCES course_results (course_id)
 );
