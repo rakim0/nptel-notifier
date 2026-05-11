@@ -8,5 +8,8 @@ enabled = true
 [[d1_databases]]
 binding = "DB"
 database_name = "nptel-notifier"
-database_id = "local-development"
+database_id = "a5b23053-be8e-40b3-9934-be4eb63a8cee"
 migrations_dir = "migrations"
+
+[triggers]
+crons = ["*/30 * * * *"]

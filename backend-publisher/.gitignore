@@ -4,3 +4,4 @@ dist/
 temp/
 .agents/
 skills-lock.json
+.dev.vars

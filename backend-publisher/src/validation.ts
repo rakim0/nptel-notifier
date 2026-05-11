@@ -5,7 +5,13 @@ export const createSubscriberSchema = z.object({
   contactValue: z.string().trim().min(1),
 });
 
+export const createCourseQuerySchema = z.object({
+  courseQuery: z.string().trim().min(1),
+});
+
 export type CreateSubscriberInput = z.infer<typeof createSubscriberSchema>;
+
+export type CreateCourseQueryInput = z.infer<typeof createCourseQuerySchema>;
 
 export interface ValidationErrorResponse {
   error: string;

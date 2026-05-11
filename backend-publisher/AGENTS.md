@@ -26,6 +26,21 @@
 - Keep route paths in route constants/enums.
 - Prefer small request helper functions such as `isGetRequest()` over repeating inline request-method checks.
 
+## Testing
+
+- Tests live in the `test/` directory alongside `test/tsconfig.json`.
+- Use **Vitest** with **`@cloudflare/vitest-pool-workers`** so tests run inside the actual Workers runtime (`workerd`).
+- D1 migrations are applied automatically before each test file via `test/apply-migrations.ts`.
+- Prefer integration tests using `exports.default.fetch()` against the real Worker handler.
+- Run tests in watch mode while developing:
+  ```bash
+  pnpm test
+  ```
+- Run tests once (CI-style):
+  ```bash
+  pnpm test:run
+  ```
+
 ## Git
 
 - Use Conventional Commits.
