@@ -2,3 +2,5 @@ node_modules/
 .wrangler/
 dist/
 pnpm-lock.yaml
+.agents/
+skills-lock.json

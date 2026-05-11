@@ -2,3 +2,5 @@ node_modules/
 .wrangler/
 dist/
 temp/
+.agents/
+skills-lock.json

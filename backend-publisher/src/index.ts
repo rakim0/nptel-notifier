@@ -1,27 +1,21 @@
 import {
-  CONTENT_TYPE_JSON,
   DATABASE_STATUS_CONNECTED,
   ERROR_DATABASE_UNAVAILABLE,
+  ERROR_INVALID_JSON,
+  ERROR_INVALID_SUBSCRIBER_REQUEST,
   ERROR_NOT_FOUND,
-  HEADER_CONTENT_TYPE,
   SERVICE_NAME,
   SQL_SELECT_DATABASE_HEALTH,
 } from "./constants";
+import { json } from "./http";
 import { Route } from "./routes";
-import { isGetRequest, isRoute } from "./utils/request";
+import { createSubscriber, listSubscribers } from "./subscribers";
+import { isGetRequest, isPostRequest, isRoute } from "./utils/request";
+import { toValidationErrorResponse } from "./validation";
+import { ZodError } from "zod";
 
 export interface Env {
   DB: D1Database;
-}
-
-function json(data: unknown, init: ResponseInit = {}): Response {
-  return Response.json(data, {
-    ...init,
-    headers: {
-      [HEADER_CONTENT_TYPE]: CONTENT_TYPE_JSON,
-      ...init.headers,
-    },
-  });
 }
 
 export default {
@@ -56,6 +50,40 @@ export default {
             error: ERROR_DATABASE_UNAVAILABLE,
           },
           { status: 503 },
+        );
+      }
+    }
+
+    if (isGetRequest(request) && isRoute(url, Route.Subscribers)) {
+      const subscribers = await listSubscribers(_env.DB);
+
+      return json({
+        subscribers,
+      });
+    }
+
+    if (isPostRequest(request) && isRoute(url, Route.Subscribers)) {
+      try {
+        const body = await request.json();
+        const subscriber = await createSubscriber(_env.DB, body);
+
+        return json({ subscriber }, { status: 201 });
+      } catch (error) {
+        if (error instanceof ZodError) {
+          return json(
+            toValidationErrorResponse(
+              ERROR_INVALID_SUBSCRIBER_REQUEST,
+              error.issues,
+            ),
+            { status: 400 },
+          );
+        }
+
+        return json(
+          {
+            error: ERROR_INVALID_JSON,
+          },
+          { status: 400 },
         );
       }
     }
