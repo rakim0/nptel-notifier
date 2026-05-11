@@ -15,7 +15,7 @@ Cloudflare Worker
 
 Cloudflare D1
   subscribers
-  sheet_items
+  course_results
   notifications
 
 Google Sheets
@@ -40,10 +40,11 @@ Notification provider
 - Create a D1 database.
 - Add schema tables:
   - `subscribers`
-  - `sheet_items`
+  - `course_results`
   - `notifications`
 - Bind the database to the Worker as `DB`.
 - Add local migration commands.
+- Test the binding with `GET /db/health`.
 
 ### Part 3: Subscriber API
 
@@ -55,9 +56,9 @@ Notification provider
 ### Part 4: Google Sheet Fetching
 
 - Start with public CSV export if possible.
-- Parse CSV rows into normalized sheet items.
+- Parse CSV rows into normalized course result rows.
 - Create stable IDs or hashes for rows.
-- Upsert rows into `sheet_items`.
+- Upsert rows into `course_results`.
 
 ### Part 5: Scheduled Polling
 
@@ -92,11 +93,13 @@ CREATE TABLE subscribers (
   created_at TEXT NOT NULL
 );
 
-CREATE TABLE sheet_items (
-  id TEXT PRIMARY KEY,
-  subject TEXT NOT NULL,
-  title TEXT,
-  url TEXT,
+CREATE TABLE course_results (
+  course_id TEXT PRIMARY KEY,
+  serial_number INTEGER,
+  course_name TEXT NOT NULL,
+  scores_published_on TEXT,
+  certificates_available_on TEXT,
+  score_issue_report_deadline TEXT,
   row_hash TEXT NOT NULL,
   first_seen_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
@@ -105,9 +108,9 @@ CREATE TABLE sheet_items (
 CREATE TABLE notifications (
   id TEXT PRIMARY KEY,
   subscriber_id TEXT NOT NULL,
-  sheet_item_id TEXT NOT NULL,
+  course_id TEXT NOT NULL,
   sent_at TEXT NOT NULL,
-  UNIQUE (subscriber_id, sheet_item_id)
+  UNIQUE (subscriber_id, course_id)
 );
 ```
 

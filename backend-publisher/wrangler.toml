@@ -4,3 +4,9 @@ compatibility_date = "2026-05-11"
 
 [observability]
 enabled = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "nptel-notifier"
+database_id = "local-development"
+migrations_dir = "migrations"

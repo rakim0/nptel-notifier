@@ -1,18 +1,24 @@
 import {
   CONTENT_TYPE_JSON,
+  DATABASE_STATUS_CONNECTED,
+  ERROR_DATABASE_UNAVAILABLE,
   ERROR_NOT_FOUND,
+  HEADER_CONTENT_TYPE,
   SERVICE_NAME,
+  SQL_SELECT_DATABASE_HEALTH,
 } from "./constants";
 import { Route } from "./routes";
 import { isGetRequest, isRoute } from "./utils/request";
 
-export interface Env {}
+export interface Env {
+  DB: D1Database;
+}
 
 function json(data: unknown, init: ResponseInit = {}): Response {
   return Response.json(data, {
     ...init,
     headers: {
-      "content-type": CONTENT_TYPE_JSON,
+      [HEADER_CONTENT_TYPE]: CONTENT_TYPE_JSON,
       ...init.headers,
     },
   });
@@ -31,6 +37,27 @@ export default {
         ok: true,
         service: SERVICE_NAME,
       });
+    }
+
+    if (isGetRequest(request) && isRoute(url, Route.DatabaseHealth)) {
+      try {
+        const result = await _env.DB.prepare(
+          SQL_SELECT_DATABASE_HEALTH,
+        ).first();
+
+        return json({
+          ok: result?.ok === 1,
+          database: DATABASE_STATUS_CONNECTED,
+        });
+      } catch {
+        return json(
+          {
+            ok: false,
+            error: ERROR_DATABASE_UNAVAILABLE,
+          },
+          { status: 503 },
+        );
+      }
     }
 
     return json(
