@@ -23,6 +23,7 @@ export interface SyncResult {
   new: number;
   updated: number;
   unchanged: number;
+  courseIds: string[];
 }
 
 interface ExistingRow {
@@ -131,7 +132,7 @@ export async function upsertCourseResults(
   db: D1Database,
   inserts: CourseResultInsert[],
 ): Promise<SyncResult> {
-  const result: SyncResult = { new: 0, updated: 0, unchanged: 0 };
+  const result: SyncResult = { new: 0, updated: 0, unchanged: 0, courseIds: [] };
 
   const selectStmt = db.prepare(SQL_SELECT_COURSE_RESULT_BY_ID);
   const insertStmt = db.prepare(SQL_INSERT_COURSE_RESULT);
@@ -157,6 +158,7 @@ export async function upsertCourseResults(
         )
         .run();
       result.new++;
+      result.courseIds.push(insert.courseId);
     } else if (existing.row_hash !== insert.rowHash) {
       await updateStmt
         .bind(
@@ -171,6 +173,7 @@ export async function upsertCourseResults(
         )
         .run();
       result.updated++;
+      result.courseIds.push(insert.courseId);
     } else {
       result.unchanged++;
     }
@@ -187,7 +190,7 @@ export async function syncSheet(
   const parsedRows = parseCourseCsv(csv);
 
   if (parsedRows.length === 0) {
-    return { new: 0, updated: 0, unchanged: 0 };
+    return { new: 0, updated: 0, unchanged: 0, courseIds: [] };
   }
 
   const rowHashes = await Promise.all(parsedRows.map(computeRowHash));

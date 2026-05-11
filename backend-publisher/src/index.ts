@@ -12,13 +12,19 @@ import {
 import {
   CourseQueryError,
   createSubscriberCourseQuery,
+  deleteSubscriberCourseQuery,
   listSubscriberCourseQueries,
 } from "./courseQueries";
 import { json } from "./http";
-import { matchSubscriberCourseQueriesRoute, Route } from "./routes";
+import {
+  matchCourseQueryResourceRoute,
+  matchSubscriberCourseQueriesRoute,
+  Route,
+} from "./routes";
 import { createSubscriber, listSubscribers } from "./subscribers";
 import { syncSheet } from "./sheets";
-import { isGetRequest, isPostRequest, isRoute } from "./utils/request";
+import { dispatchNotifications, TelegramProvider } from "./notifications";
+import { isDeleteRequest, isGetRequest, isPostRequest, isRoute } from "./utils/request";
 import { toValidationErrorResponse } from "./validation";
 import { ZodError } from "zod";
 
@@ -26,6 +32,7 @@ export interface Env {
   DB: D1Database;
   CSV_URL: string;
   SYNC_SECRET: string;
+  TELEGRAM_BOT_TOKEN: string;
 }
 
 export default {
@@ -180,6 +187,32 @@ export default {
       }
     }
 
+    const courseQueryResourceRoute = matchCourseQueryResourceRoute(url);
+
+    if (isDeleteRequest(request) && courseQueryResourceRoute !== null) {
+      try {
+        await deleteSubscriberCourseQuery(
+          _env.DB,
+          courseQueryResourceRoute.subscriberId,
+          courseQueryResourceRoute.queryId,
+        );
+
+        return json({ ok: true });
+      } catch (error) {
+        if (error instanceof CourseQueryError) {
+          return json(
+            { error: error.message },
+            { status: 404 },
+          );
+        }
+
+        return json(
+          { error: ERROR_NOT_FOUND },
+          { status: 404 },
+        );
+      }
+    }
+
     return json(
       {
         error: ERROR_NOT_FOUND,
@@ -198,5 +231,18 @@ export default {
     console.log(
       `Sheet sync complete: ${result.new} new, ${result.updated} updated, ${result.unchanged} unchanged`,
     );
+
+    if (result.courseIds.length > 0) {
+      const provider = new TelegramProvider(_env.TELEGRAM_BOT_TOKEN);
+      const dispatch = await dispatchNotifications(
+        _env.DB,
+        provider,
+        result.courseIds,
+      );
+
+      console.log(
+        `Notifications: ${dispatch.sent} sent, ${dispatch.skipped} skipped, ${dispatch.failed} failed`,
+      );
+    }
   },
 };

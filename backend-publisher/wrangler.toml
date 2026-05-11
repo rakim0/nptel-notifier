@@ -2,8 +2,12 @@ name = "nptel-notifier-backend"
 main = "src/index.ts"
 compatibility_date = "2026-05-11"
 
-[observability]
-enabled = true
+[observability.logs]
+enabled = false
+invocation_logs = true
+
+[observability.traces]
+enabled = false
 
 [[d1_databases]]
 binding = "DB"

@@ -1,6 +1,8 @@
 import {
   ERROR_COURSE_QUERY_ALREADY_EXISTS,
+  ERROR_NOT_FOUND,
   ERROR_SUBSCRIBER_NOT_FOUND,
+  SQL_DELETE_SUBSCRIBER_COURSE_QUERY,
   SQL_INSERT_SUBSCRIBER_COURSE_QUERY,
   SQL_SELECT_SUBSCRIBER_BY_ID,
   SQL_SELECT_SUBSCRIBER_COURSE_QUERY_BY_VALUE,
@@ -82,6 +84,21 @@ export async function createSubscriberCourseQuery(
     .run();
 
   return courseQuery;
+}
+
+export async function deleteSubscriberCourseQuery(
+  db: D1Database,
+  subscriberId: string,
+  queryId: string,
+): Promise<void> {
+  const result = await db
+    .prepare(SQL_DELETE_SUBSCRIBER_COURSE_QUERY)
+    .bind(queryId, subscriberId)
+    .run();
+
+  if (result.meta.changes === 0) {
+    throw new CourseQueryError(ERROR_NOT_FOUND);
+  }
 }
 
 function mapSubscriberCourseQueryRow(

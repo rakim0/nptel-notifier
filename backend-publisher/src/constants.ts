@@ -29,6 +29,8 @@ export const HTTP_METHOD_GET = "GET";
 
 export const HTTP_METHOD_POST = "POST";
 
+export const HTTP_METHOD_DELETE = "DELETE";
+
 export const SQL_SELECT_DATABASE_HEALTH = "SELECT 1 AS ok";
 
 export const SQL_SELECT_SUBSCRIBERS = `
@@ -66,6 +68,11 @@ export const SQL_SELECT_SUBSCRIBER_COURSE_QUERY_BY_VALUE = `
 export const SQL_INSERT_SUBSCRIBER_COURSE_QUERY = `
   INSERT INTO subscriber_course_queries (id, subscriber_id, course_query, created_at)
   VALUES (?, ?, ?, ?)
+`;
+
+export const SQL_DELETE_SUBSCRIBER_COURSE_QUERY = `
+  DELETE FROM subscriber_course_queries
+  WHERE id = ? AND subscriber_id = ?
 `;
 
 export const SQL_SELECT_COURSE_RESULT_BY_ID = `

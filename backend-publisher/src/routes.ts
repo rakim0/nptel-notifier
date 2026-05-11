@@ -38,3 +38,33 @@ export function matchSubscriberCourseQueriesRoute(
 
   return null;
 }
+
+export interface CourseQueryResourceRoute {
+  subscriberId: string;
+  queryId: string;
+}
+
+export function matchCourseQueryResourceRoute(
+  url: URL,
+): CourseQueryResourceRoute | null {
+  const segments = url.pathname
+    .split(PATH_SEPARATOR)
+    .filter((segment) => segment !== EMPTY_STRING);
+  const subscribersSegment = Route.Subscribers.replace(
+    PATH_SEPARATOR,
+    EMPTY_STRING,
+  );
+
+  if (
+    segments.length === 4 &&
+    segments[0] === subscribersSegment &&
+    segments[2] === RouteSegment.CourseQueries
+  ) {
+    return {
+      subscriberId: decodeURIComponent(segments[1]),
+      queryId: decodeURIComponent(segments[3]),
+    };
+  }
+
+  return null;
+}
